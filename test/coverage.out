@@ -15,3 +15,10 @@ movies-xsis/controller/movieController.go:80.55,87.4 5 1
 movies-xsis/controller/movieController.go:90.2,92.32 2 1
 movies-xsis/controller/movieController.go:92.32,97.3 3 1
 movies-xsis/controller/movieController.go:99.2,102.31 3 1
+movies-xsis/controller/movieController.go:105.60,110.16 3 1
+movies-xsis/controller/movieController.go:110.16,114.3 3 1
+movies-xsis/controller/movieController.go:116.2,118.32 2 1
+movies-xsis/controller/movieController.go:118.32,123.32 4 1
+movies-xsis/controller/movieController.go:123.32,126.4 2 1
+movies-xsis/controller/movieController.go:128.3,128.32 1 1
+movies-xsis/controller/movieController.go:131.2,144.31 5 1

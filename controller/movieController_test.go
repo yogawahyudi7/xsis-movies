@@ -279,3 +279,117 @@ func TestAddMovie_InvalidJSONParameters(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, httpResponse.Code)
 
 }
+
+func TestGetMovie_DataFound(t *testing.T) {
+
+	expectedData := model.Movie{
+		Id:    1,
+		Title: "Pengabdi Setan",
+	}
+
+	expectedResponse := common.StatusResponse{
+		Code:  200,
+		Error: nil,
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	movieRepository.Mock.On("GetById", 1).Return(expectedData, expectedResponse)
+
+	app := fiber.New()
+
+	app.Get("/movies/:id", movieController.GetMovie)
+
+	req := httptest.NewRequest(http.MethodGet, "/movies/1", nil)
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("Response : ", httpResponse)
+
+	assert.Equal(t, http.StatusOK, httpResponse.Code)
+
+}
+
+func TestGetMovie_InvalidRouteParamters(t *testing.T) {
+
+	expectedData := model.Movie{
+		Id:    1,
+		Title: "Pengabdi Setan",
+	}
+
+	expectedResponse := common.StatusResponse{
+		Code:  200,
+		Error: nil,
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	movieRepository.Mock.On("GetById", 1).Return(expectedData, expectedResponse)
+
+	app := fiber.New()
+
+	app.Get("/movies/:id", movieController.GetMovie)
+
+	req := httptest.NewRequest(http.MethodGet, "/movies/a", nil)
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("Response : ", httpResponse)
+
+	assert.Equal(t, http.StatusBadRequest, httpResponse.Code)
+
+}
+
+func TestGetMovie_DataNotFound(t *testing.T) {
+
+	expectedData := model.Movie{
+		Id:    1,
+		Title: "Pengabdi Setan",
+	}
+
+	expectedResponse := common.StatusResponse{
+		Code:  404,
+		Error: errors.New(constant.ErrTestResponse),
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	movieRepository.Mock.On("GetById", 1).Return(expectedData, expectedResponse)
+
+	app := fiber.New()
+
+	app.Get("/movies/:id", movieController.GetMovie)
+
+	req := httptest.NewRequest(http.MethodGet, "/movies/1", nil)
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("Response : ", httpResponse)
+
+	assert.Equal(t, http.StatusNotFound, httpResponse.Code)
+
+}

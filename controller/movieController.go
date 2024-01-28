@@ -101,3 +101,45 @@ func (get *MovieController) AddMovie(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(httpResponse)
 }
+
+func (get *MovieController) GetMovie(ctx *fiber.Ctx) error {
+
+	httpResponse := common.HttpResponse{}
+
+	id, err := ctx.ParamsInt("id")
+	if err != nil {
+		httpResponse.Code = 400
+		httpResponse.Message = constant.InvalidRouteParameters
+		return ctx.JSON(httpResponse)
+	}
+
+	movieData, movieResponse := get.Movie.GetById(id)
+
+	if movieResponse.Error != nil {
+		httpResponse.Code = 500
+		httpResponse.Message = constant.ServerUnderMaintenance
+		httpResponse.Data = nil
+
+		if movieResponse.Code == 404 {
+			httpResponse.Code = 404
+			httpResponse.Message = constant.DataIsNotAvailabe
+		}
+
+		return ctx.JSON(httpResponse)
+	}
+
+	data := common.GetMovieResponse{
+		Id:          movieData.Id,
+		Title:       movieData.Title,
+		Description: movieData.Description,
+		Image:       movieData.Image,
+		CreatedAt:   movieData.CreatedAt,
+		UpdatedAt:   movieData.UpdatedAt,
+	}
+
+	httpResponse.Code = 200
+	httpResponse.Message = constant.DataFound
+	httpResponse.Data = data
+
+	return ctx.JSON(httpResponse)
+}

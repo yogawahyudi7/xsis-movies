@@ -22,3 +22,9 @@ func (movie *MovieRepositoryMock) Add(parameter common.AddMovieRequest) (respons
 
 	return args.Get(0).(common.StatusResponse)
 }
+
+func (movie *MovieRepositoryMock) GetById(parameter int) (model.Movie, common.StatusResponse) {
+	args := movie.Mock.Called(parameter)
+
+	return args.Get(0).(model.Movie), args.Get(1).(common.StatusResponse)
+}

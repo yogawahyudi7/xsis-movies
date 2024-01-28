@@ -12,6 +12,7 @@ import (
 type MovieRepositoryInterface interface {
 	GetAll() ([]model.Movie, common.StatusResponse)
 	Add(parameter common.AddMovieRequest) (response common.StatusResponse)
+	GetById(parameter int) (model.Movie, common.StatusResponse)
 }
 
 type MovieRepository struct {
@@ -82,4 +83,35 @@ func (movie *MovieRepository) Add(parameter common.AddMovieRequest) (response co
 	}
 
 	return response
+}
+
+func (movie *MovieRepository) GetById(parameter int) (model.Movie, common.StatusResponse) {
+
+	movies := model.Movie{}
+	response := common.StatusResponse{}
+
+	query := movie.db.Debug()
+	query = query.Where("id = ?", parameter)
+	query = query.Find(&movies)
+
+	if query.Error != nil {
+
+		response.Code = 500
+		response.Error = query.Error
+
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			response.Code = 404
+		}
+
+		return movies, response
+	}
+
+	if movies.Id == 0 {
+		response.Code = 404
+		response.Error = errors.New(constant.ErrDataEmpty)
+
+		return movies, response
+	}
+
+	return movies, response
 }
