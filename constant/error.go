@@ -1,5 +1,6 @@
 package constant
 
 var (
-	ErrDataEmpty = "data empty"
+	ErrDataEmpty   = "data empty"
+	ErrRowAffected = "row affected is null"
 )

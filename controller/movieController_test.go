@@ -14,6 +14,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -37,14 +38,15 @@ func TestGetAllMovies_DataFound(t *testing.T) {
 		Error: nil,
 	}
 
+	validate := validator.New()
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
-	movieController := controller.NewMovieController(movieRepository)
+	movieController := controller.NewMovieController(validate, movieRepository)
 
 	movieRepository.Mock.On("GetAll").Return(expectedData, expectedResponse)
 
 	app := fiber.New()
 
-	app.Get("/movies", movieController.GetAllMovie)
+	app.Get("/movies", movieController.GetAllMovies)
 
 	req := httptest.NewRequest(http.MethodGet, "/movies", nil)
 
@@ -80,14 +82,15 @@ func TestGetAllMovies_DataNotFound(t *testing.T) {
 		Error: errors.New(constant.ErrTestResponse),
 	}
 
+	validate := validator.New()
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
-	movieController := controller.NewMovieController(movieRepository)
+	movieController := controller.NewMovieController(validate, movieRepository)
 
 	movieRepository.Mock.On("GetAll").Return(expectedData, expectedResponse)
 
 	app := fiber.New()
 
-	app.Get("/movies", movieController.GetAllMovie)
+	app.Get("/movies", movieController.GetAllMovies)
 
 	// Create a request
 	req := httptest.NewRequest(http.MethodGet, "/movies", nil)

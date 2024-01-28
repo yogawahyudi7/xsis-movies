@@ -16,3 +16,8 @@ func (movie *MovieRepositoryMock) GetAll() ([]model.Movie, common.StatusResponse
 
 	return args.Get(0).([]model.Movie), args.Get(1).(common.StatusResponse)
 }
+
+func (movie *MovieRepositoryMock) Add(parameter common.AddMovieRequest) (response common.StatusResponse) {
+
+	return response
+}

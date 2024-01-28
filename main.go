@@ -7,6 +7,7 @@ import (
 	"movies-xsis/router"
 	"movies-xsis/util"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/goccy/go-json"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,8 +17,9 @@ func main() {
 
 	setup := config.Get()
 	postgresql := util.DBConnection(setup)
+	validate := validator.New()
 	movieRepository := repository.NewMovieRepository(postgresql)
-	movieController := controller.NewMovieController(movieRepository)
+	movieController := controller.NewMovieController(validate, movieRepository)
 
 	app := fiber.New(fiber.Config{
 		JSONEncoder: json.Marshal,

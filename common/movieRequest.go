@@ -1,9 +1,8 @@
 package common
 
 type AddMovieRequest struct {
-	Id          uint
-	Title       string
-	Description string
-	Rating      string
-	Image       string
+	Title       string  `json:"title" validate:"required"`
+	Description string  `json:"description" validate:"required"`
+	Rating      float64 `json:"rating" validate:"required,numeric"`
+	Image       string  `json:"image"`
 }

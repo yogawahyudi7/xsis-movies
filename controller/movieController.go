@@ -4,21 +4,26 @@ import (
 	"movies-xsis/common"
 	"movies-xsis/constant"
 	"movies-xsis/repository"
+	"movies-xsis/validator"
+	"reflect"
 
+	validate "github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
 type MovieController struct {
-	Movie repository.MovieRepositoryInterface
+	Validate *validate.Validate
+	Movie    repository.MovieRepositoryInterface
 }
 
-func NewMovieController(movie repository.MovieRepositoryInterface) *MovieController {
+func NewMovieController(validate *validate.Validate, movie repository.MovieRepositoryInterface) *MovieController {
 	return &MovieController{
-		Movie: movie,
+		Validate: validate,
+		Movie:    movie,
 	}
 }
 
-func (get *MovieController) GetAllMovie(ctx *fiber.Ctx) error {
+func (get *MovieController) GetAllMovies(ctx *fiber.Ctx) error {
 
 	movieData, movieResponse := get.Movie.GetAll()
 
@@ -54,6 +59,45 @@ func (get *MovieController) GetAllMovie(ctx *fiber.Ctx) error {
 	httpResponse.Code = 200
 	httpResponse.Message = constant.DataFound
 	httpResponse.Data = data
+
+	return ctx.JSON(httpResponse)
+}
+
+func (get *MovieController) AddMovie(ctx *fiber.Ctx) error {
+
+	movie := common.AddMovieRequest{}
+	httpResponse := common.HttpResponse{}
+	httpResponse.Data = nil
+
+	if err := ctx.BodyParser(&movie); err != nil {
+		httpResponse.Code = 400
+		httpResponse.Message = constant.InvalidJsonParameters
+		return ctx.JSON(httpResponse)
+	}
+
+	if err := get.Validate.Struct(movie); err != nil {
+
+		for _, err := range err.(validate.ValidationErrors) {
+			field, _ := reflect.TypeOf(movie).FieldByName(err.StructField())
+
+			message := validator.TemplateMessage(field, err)
+			httpResponse.Code = 400
+			httpResponse.Message = message
+			return ctx.JSON(httpResponse)
+		}
+	}
+
+	movieResponse := get.Movie.Add(movie)
+
+	if movieResponse.Error != nil {
+		httpResponse.Code = 500
+		httpResponse.Message = constant.ServerUnderMaintenance
+
+		return ctx.JSON(httpResponse)
+	}
+
+	httpResponse.Code = 200
+	httpResponse.Message = constant.DataSaved
 
 	return ctx.JSON(httpResponse)
 }

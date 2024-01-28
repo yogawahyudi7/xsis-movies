@@ -11,6 +11,7 @@ import (
 
 type MovieRepositoryInterface interface {
 	GetAll() ([]model.Movie, common.StatusResponse)
+	Add(parameter common.AddMovieRequest) (response common.StatusResponse)
 }
 
 type MovieRepository struct {
@@ -51,4 +52,34 @@ func (movie *MovieRepository) GetAll() ([]model.Movie, common.StatusResponse) {
 	}
 
 	return movies, response
+}
+
+func (movie *MovieRepository) Add(parameter common.AddMovieRequest) (response common.StatusResponse) {
+
+	addMovie := model.Movie{
+		Title:       parameter.Title,
+		Description: parameter.Description,
+		Rating:      parameter.Rating,
+		Image:       parameter.Image,
+	}
+
+	query := movie.db.Debug()
+	query = query.Create(&addMovie)
+
+	if query.Error != nil {
+
+		response.Code = 500
+		response.Error = query.Error
+
+		return response
+	}
+
+	if query.RowsAffected < 1 {
+		response.Code = 500
+		response.Error = errors.New(constant.ErrRowAffected)
+
+		return response
+	}
+
+	return response
 }
