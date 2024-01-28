@@ -1,0 +1,1 @@
+go tool cover -func=test/coverage.out
