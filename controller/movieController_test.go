@@ -1,6 +1,7 @@
 package controller_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -106,5 +107,175 @@ func TestGetAllMovies_DataNotFound(t *testing.T) {
 	fmt.Println("result :", httpResponse)
 
 	assert.Equal(t, http.StatusNotFound, httpResponse.Code)
+
+}
+
+func TestAddMovie_DataSaved(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  200,
+		Error: nil,
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := common.AddMovieRequest{
+		Title:       "Power Rangers",
+		Description: "Pahlawan super pembela kebeneran",
+		Rating:      8,
+		Image:       "",
+	}
+	movieRepository.Mock.On("Add", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Post("/movies", movieController.AddMovie)
+
+	// Create a request
+	requestBody, _ := json.Marshal(request)
+	req := httptest.NewRequest(http.MethodPost, "/movies", bytes.NewBuffer(requestBody))
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("result :", httpResponse)
+
+	assert.Equal(t, http.StatusOK, httpResponse.Code)
+
+}
+
+func TestAddMovie_ServerUnderMaintenance(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  500,
+		Error: errors.New(constant.ErrTestResponse),
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := common.AddMovieRequest{
+		Title:       "Power Rangers",
+		Description: "Pahlawan super pembela kebeneran",
+		Rating:      8,
+		Image:       "",
+	}
+	movieRepository.Mock.On("Add", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Post("/movies", movieController.AddMovie)
+
+	// Create a request
+	requestBody, _ := json.Marshal(request)
+	req := httptest.NewRequest(http.MethodPost, "/movies", bytes.NewBuffer(requestBody))
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("result :", httpResponse)
+
+	assert.Equal(t, http.StatusInternalServerError, httpResponse.Code)
+
+}
+
+func TestAddMovie_ValidationFailed(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  200,
+		Error: nil,
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := common.AddMovieRequest{
+		Title:       "Power Rangers",
+		Description: "",
+		Rating:      8,
+		Image:       "",
+	}
+	movieRepository.Mock.On("Add", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Post("/movies", movieController.AddMovie)
+
+	// Create a request
+	requestBody, _ := json.Marshal(request)
+	req := httptest.NewRequest(http.MethodPost, "/movies", bytes.NewBuffer(requestBody))
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("result :", httpResponse)
+
+	assert.Equal(t, http.StatusBadRequest, httpResponse.Code)
+
+}
+
+func TestAddMovie_InvalidJSONParameters(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  200,
+		Error: nil,
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := common.AddMovieRequest{
+		Title:       "Power Rangers",
+		Description: "Pahlawan super pembela kebeneran",
+		Rating:      8,
+		Image:       "",
+	}
+	movieRepository.Mock.On("Add", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Post("/movies", movieController.AddMovie)
+
+	// Create a request
+	requestBody, _ := json.Marshal(request)
+	req := httptest.NewRequest(http.MethodPost, "/movies", bytes.NewBuffer(requestBody))
+
+	// comment the code below to make apicall cant read the json request propertly
+	// req.Header.Set("Content-Type", "application/json")
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("result :", httpResponse)
+
+	assert.Equal(t, http.StatusBadRequest, httpResponse.Code)
 
 }
