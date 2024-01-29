@@ -28,3 +28,9 @@ func (movie *MovieRepositoryMock) GetById(parameter int) (model.Movie, common.St
 
 	return args.Get(0).(model.Movie), args.Get(1).(common.StatusResponse)
 }
+
+func (movie *MovieRepositoryMock) Delete(parameter int) (response common.StatusResponse) {
+	args := movie.Mock.Called(parameter)
+
+	return args.Get(0).(common.StatusResponse)
+}

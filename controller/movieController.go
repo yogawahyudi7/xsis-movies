@@ -143,3 +143,30 @@ func (get *MovieController) GetMovie(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(httpResponse)
 }
+
+func (get *MovieController) DeleteMovie(ctx *fiber.Ctx) error {
+
+	httpResponse := common.HttpResponse{}
+	httpResponse.Data = nil
+
+	id, err := ctx.ParamsInt("id")
+	if err != nil {
+		httpResponse.Code = 400
+		httpResponse.Message = constant.InvalidRouteParameters
+		return ctx.JSON(httpResponse)
+	}
+
+	movieResponse := get.Movie.Delete(id)
+
+	if movieResponse.Error != nil {
+		httpResponse.Code = 500
+		httpResponse.Message = constant.ServerUnderMaintenance
+
+		return ctx.JSON(httpResponse)
+	}
+
+	httpResponse.Code = 200
+	httpResponse.Message = constant.DataFound
+
+	return ctx.JSON(httpResponse)
+}

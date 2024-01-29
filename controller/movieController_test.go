@@ -393,3 +393,102 @@ func TestGetMovie_DataNotFound(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, httpResponse.Code)
 
 }
+
+func TestDeleteMovie_DataDeleted(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  200,
+		Error: nil,
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	movieRepository.Mock.On("Delete", 1).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Delete("/movies/:id", movieController.DeleteMovie)
+
+	req := httptest.NewRequest(http.MethodDelete, "/movies/1", nil)
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("Response : ", httpResponse)
+
+	assert.Equal(t, http.StatusOK, httpResponse.Code)
+
+}
+
+func TestDeleteMovie_InvalidRouteParamters(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  200,
+		Error: nil,
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	movieRepository.Mock.On("Delete", 1).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Delete("/movies/:id", movieController.DeleteMovie)
+
+	req := httptest.NewRequest(http.MethodDelete, "/movies/a", nil)
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("Response : ", httpResponse)
+
+	assert.Equal(t, http.StatusBadRequest, httpResponse.Code)
+
+}
+
+func TestDeleteMovie_ServerUnderMaintenance(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  500,
+		Error: errors.New(constant.ErrTestResponse),
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	movieRepository.Mock.On("Delete", 1).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Delete("/movies/:id", movieController.DeleteMovie)
+
+	req := httptest.NewRequest(http.MethodDelete, "/movies/1", nil)
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("Response : ", httpResponse)
+
+	assert.Equal(t, http.StatusInternalServerError, httpResponse.Code)
+
+}

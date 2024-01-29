@@ -7,4 +7,5 @@ const (
 	InvalidRouteParameters = "Sorry, The route parameters is invalid."
 	DataFound              = "Data Found."
 	DataSaved              = "Data Saved."
+	DataDeleted            = "Data Deleted."
 )
