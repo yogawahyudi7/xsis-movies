@@ -487,3 +487,167 @@ func TestAddMovie_RowAffectedIsNull(t *testing.T) {
 
 	assert.Error(t, response.Error)
 }
+
+// IMPLEMENT MYSQL DRIVER FOR SUPPORT UPDATE REPOSITORY TESTING
+func TestUpdateMovie_DataSaved(t *testing.T) {
+
+	// Setup GORM with sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Error creating mock database: %v", err)
+	}
+	defer db.Close()
+
+	gormDB, err := gorm.Open(mysql.New(mysql.Config{
+		Conn:                      db,
+		SkipInitializeWithVersion: true,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Error opening GORM database: %v", err)
+	}
+
+	movieRepository := repository.NewMovieRepository(gormDB)
+
+	time := time.Now()
+
+	// Data movie yang akan diuji
+	query := model.Movie{
+		Id:          1,
+		Title:       "Movie Title",
+		Description: "Movie Description",
+		Rating:      8.5,
+		Image:       "movie.jpg",
+		CreatedAt:   &time,
+		UpdatedAt:   &time,
+		DeletedAt:   nil,
+	}
+
+	// Expect Exec to be called with a raw query
+	mock.ExpectBegin()
+	mock.ExpectExec("UPDATE `movies` SET").
+		WithArgs(
+			query.Title,
+			query.Description,
+			query.Rating,
+			query.Image,
+			query.CreatedAt,
+			query.UpdatedAt,
+			// query.DeletedAt,
+			query.Id,
+			query.Id, // NEED THIS! THIS IS ANOMALI IN SQLMOCK
+		).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+
+	response := movieRepository.Update(query)
+
+	assert.NoError(t, response.Error)
+}
+
+func TestUpdateMovie_QueryError(t *testing.T) {
+
+	// Setup GORM with sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Error creating mock database: %v", err)
+	}
+	defer db.Close()
+
+	gormDB, err := gorm.Open(mysql.New(mysql.Config{
+		Conn:                      db,
+		SkipInitializeWithVersion: true,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Error opening GORM database: %v", err)
+	}
+
+	movieRepository := repository.NewMovieRepository(gormDB)
+
+	time := time.Now()
+
+	// Data movie yang akan diuji
+	query := model.Movie{
+		Id:          1,
+		Title:       "Movie Title",
+		Description: "Movie Description",
+		Rating:      8.5,
+		Image:       "movie.jpg",
+		CreatedAt:   &time,
+		UpdatedAt:   &time,
+		DeletedAt:   nil,
+	}
+
+	// Expect Exec to be called with a raw query
+	mock.ExpectBegin()
+	mock.ExpectExec("UPDATE `movies` SET").
+		WithArgs(
+			query.Title,
+			query.Description,
+			query.Rating,
+			query.Image,
+			query.CreatedAt,
+			query.UpdatedAt,
+			// query.DeletedAt,
+			query.Id,
+			query.Id, // NEED THIS! THIS IS ANOMALI IN SQLMOCK
+		).WillReturnError(errors.New(constant.ErrTestResponse))
+	mock.ExpectCommit()
+
+	response := movieRepository.Update(query)
+
+	assert.Error(t, response.Error)
+}
+
+func TestUpdateMovie_RowAffectedIsNull(t *testing.T) {
+
+	// Setup GORM with sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Error creating mock database: %v", err)
+	}
+	defer db.Close()
+
+	gormDB, err := gorm.Open(mysql.New(mysql.Config{
+		Conn:                      db,
+		DriverName:                "mysql",
+		SkipInitializeWithVersion: true,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Error opening GORM database: %v", err)
+	}
+
+	movieRepository := repository.NewMovieRepository(gormDB)
+
+	time := time.Now()
+
+	// Data movie yang akan diuji
+	query := model.Movie{
+		Id:          1,
+		Title:       "Movie Title",
+		Description: "Movie Description",
+		Rating:      8.5,
+		Image:       "movie.jpg",
+		CreatedAt:   &time,
+		UpdatedAt:   &time,
+		DeletedAt:   nil,
+	}
+
+	// Expect Exec to be called with a raw query
+	mock.ExpectBegin()
+	mock.ExpectExec("UPDATE `movies` SET").
+		WithArgs(
+			query.Title,
+			query.Description,
+			query.Rating,
+			query.Image,
+			query.CreatedAt,
+			query.UpdatedAt,
+			// query.DeletedAt,
+			query.Id,
+			query.Id, // NEED THIS! THIS IS ANOMALI IN SQLMOCK
+		).WillReturnResult(sqlmock.NewResult(1, 0))
+	mock.ExpectCommit()
+
+	response := movieRepository.Update(query)
+
+	assert.Error(t, response.Error)
+}

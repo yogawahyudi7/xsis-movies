@@ -137,7 +137,7 @@ func (movie *MovieRepository) Update(parameter model.Movie) (response common.Sta
 
 	query := movie.db.Debug()
 	query = query.Where("id = ?", parameter.Id)
-	query = query.Save(&parameter)
+	query = query.Updates(&parameter)
 
 	if query.Error != nil {
 
