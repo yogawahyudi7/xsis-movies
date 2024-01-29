@@ -2,12 +2,10 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Movie struct {
-	gorm.Model
+	// gorm.Model
 	Id          uint    `gorm:"primaryKey;AUTO_INCREMENT;column:id"`
 	Title       string  `gorm:"column:title"`
 	Description string  `gorm:"column:description"`

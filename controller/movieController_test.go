@@ -121,7 +121,7 @@ func TestAddMovie_DataSaved(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	request := common.AddMovieRequest{
+	request := model.Movie{
 		Title:       "Power Rangers",
 		Description: "Pahlawan super pembela kebeneran",
 		Rating:      8,
@@ -163,7 +163,7 @@ func TestAddMovie_ServerUnderMaintenance(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	request := common.AddMovieRequest{
+	request := model.Movie{
 		Title:       "Power Rangers",
 		Description: "Pahlawan super pembela kebeneran",
 		Rating:      8,
@@ -205,7 +205,7 @@ func TestAddMovie_ValidationFailed(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	request := common.AddMovieRequest{
+	request := model.Movie{
 		Title:       "Power Rangers",
 		Description: "",
 		Rating:      8,
@@ -247,7 +247,7 @@ func TestAddMovie_InvalidJSONParameters(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	request := common.AddMovieRequest{
+	request := model.Movie{
 		Title:       "Power Rangers",
 		Description: "Pahlawan super pembela kebeneran",
 		Rating:      8,
@@ -504,7 +504,7 @@ func TestUpdateMovie_DataUpdated(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	request := common.UpdateMovieRequest{
+	request := model.Movie{
 		Id:          1,
 		Title:       "Power Rangers",
 		Description: "Pahlawan super pembela kebeneran",
@@ -547,7 +547,7 @@ func TestUpdateMovie_ServerUnderMaintenance(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	request := common.UpdateMovieRequest{
+	request := model.Movie{
 		Id:          1,
 		Title:       "Power Rangers",
 		Description: "Pahlawan super pembela kebeneran",
@@ -591,7 +591,7 @@ func TestUpdateMovie_ValidationFailed(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	request := common.UpdateMovieRequest{
+	request := model.Movie{
 		Id:          1,
 		Title:       "",
 		Description: "Pahlawan super pembela kebeneran",
@@ -636,7 +636,7 @@ func TestUpdateMovie_InvalidJSONParameters(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	request := common.UpdateMovieRequest{
+	request := model.Movie{
 		Id:          1,
 		Title:       "Power Ranger",
 		Description: "Pahlawan super pembela kebeneran",

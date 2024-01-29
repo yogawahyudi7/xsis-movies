@@ -11,10 +11,10 @@ import (
 
 type MovieRepositoryInterface interface {
 	GetAll() ([]model.Movie, common.StatusResponse)
-	Add(parameter common.AddMovieRequest) (response common.StatusResponse)
+	Add(parameter model.Movie) (response common.StatusResponse)
 	GetById(parameter int) (model.Movie, common.StatusResponse)
 	Delete(parameter int) (response common.StatusResponse)
-	Update(parameter common.UpdateMovieRequest) (response common.StatusResponse)
+	Update(parameter model.Movie) (response common.StatusResponse)
 }
 
 type MovieRepository struct {
@@ -53,17 +53,10 @@ func (movie *MovieRepository) GetAll() ([]model.Movie, common.StatusResponse) {
 	return movies, response
 }
 
-func (movie *MovieRepository) Add(parameter common.AddMovieRequest) (response common.StatusResponse) {
-
-	addMovie := model.Movie{
-		Title:       parameter.Title,
-		Description: parameter.Description,
-		Rating:      parameter.Rating,
-		Image:       parameter.Image,
-	}
+func (movie *MovieRepository) Add(parameter model.Movie) (response common.StatusResponse) {
 
 	query := movie.db.Debug()
-	query = query.Create(&addMovie)
+	query = query.Create(&parameter)
 
 	if query.Error != nil {
 
@@ -140,18 +133,11 @@ func (movie *MovieRepository) Delete(parameter int) (response common.StatusRespo
 	return response
 }
 
-func (movie *MovieRepository) Update(parameter common.UpdateMovieRequest) (response common.StatusResponse) {
-
-	updateMovie := model.Movie{
-		Title:       parameter.Title,
-		Description: parameter.Description,
-		Rating:      parameter.Rating,
-		Image:       parameter.Image,
-	}
+func (movie *MovieRepository) Update(parameter model.Movie) (response common.StatusResponse) {
 
 	query := movie.db.Debug()
 	query = query.Where("id = ?", parameter.Id)
-	query = query.Save(&updateMovie)
+	query = query.Save(&parameter)
 
 	if query.Error != nil {
 

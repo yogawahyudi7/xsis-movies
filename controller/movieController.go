@@ -3,6 +3,7 @@ package controller
 import (
 	"movies-xsis/common"
 	"movies-xsis/constant"
+	"movies-xsis/model"
 	"movies-xsis/repository"
 	"movies-xsis/validator"
 	"reflect"
@@ -87,7 +88,14 @@ func (get *MovieController) AddMovie(ctx *fiber.Ctx) error {
 		}
 	}
 
-	movieResponse := get.Movie.Add(movie)
+	req := model.Movie{
+		Title:       movie.Title,
+		Description: movie.Description,
+		Rating:      movie.Rating,
+		Image:       movie.Image,
+	}
+
+	movieResponse := get.Movie.Add(req)
 
 	if movieResponse.Error != nil {
 		httpResponse.Code = 500
@@ -195,7 +203,14 @@ func (get *MovieController) UpdateMovie(ctx *fiber.Ctx) error {
 		}
 	}
 
-	movieResponse := get.Movie.Update(movie)
+	req := model.Movie{
+		Id:          uint(movie.Id),
+		Title:       movie.Title,
+		Description: movie.Description,
+		Rating:      movie.Rating,
+		Image:       movie.Image,
+	}
+	movieResponse := get.Movie.Update(req)
 
 	if movieResponse.Error != nil {
 		httpResponse.Code = 500
