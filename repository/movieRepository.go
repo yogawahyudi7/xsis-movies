@@ -40,10 +40,6 @@ func (movie *MovieRepository) GetAll() ([]model.Movie, common.StatusResponse) {
 		response.Code = 500
 		response.Error = query.Error
 
-		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
-			response.Code = 404
-		}
-
 		return movies, response
 	}
 
