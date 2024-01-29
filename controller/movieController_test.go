@@ -492,3 +492,181 @@ func TestDeleteMovie_ServerUnderMaintenance(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, httpResponse.Code)
 
 }
+
+func TestUpdateMovie_DataUpdated(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  200,
+		Error: nil,
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := common.UpdateMovieRequest{
+		Id:          1,
+		Title:       "Power Rangers",
+		Description: "Pahlawan super pembela kebeneran",
+		Rating:      8,
+		Image:       "",
+	}
+	movieRepository.Mock.On("Update", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Patch("/movies", movieController.UpdateMovie)
+
+	// Create a request
+	requestBody, _ := json.Marshal(request)
+	req := httptest.NewRequest(http.MethodPatch, "/movies", bytes.NewBuffer(requestBody))
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("result :", httpResponse)
+
+	assert.Equal(t, http.StatusOK, httpResponse.Code)
+
+}
+
+func TestUpdateMovie_ServerUnderMaintenance(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  500,
+		Error: errors.New(constant.ErrTestResponse),
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := common.UpdateMovieRequest{
+		Id:          1,
+		Title:       "Power Rangers",
+		Description: "Pahlawan super pembela kebeneran",
+		Rating:      8,
+		Image:       "",
+	}
+
+	movieRepository.Mock.On("Update", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Patch("/movies", movieController.UpdateMovie)
+
+	// Create a request
+	requestBody, _ := json.Marshal(request)
+	req := httptest.NewRequest(http.MethodPatch, "/movies", bytes.NewBuffer(requestBody))
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("result :", httpResponse)
+
+	assert.Equal(t, http.StatusInternalServerError, httpResponse.Code)
+
+}
+
+func TestUpdateMovie_ValidationFailed(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  500,
+		Error: errors.New(constant.ErrTestResponse),
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := common.UpdateMovieRequest{
+		Id:          1,
+		Title:       "",
+		Description: "Pahlawan super pembela kebeneran",
+		Rating:      8,
+		Image:       "",
+	}
+
+	movieRepository.Mock.On("Update", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Patch("/movies", movieController.UpdateMovie)
+
+	// Create a request
+	requestBody, _ := json.Marshal(request)
+	req := httptest.NewRequest(http.MethodPatch, "/movies", bytes.NewBuffer(requestBody))
+
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("result :", httpResponse)
+
+	assert.Equal(t, http.StatusBadRequest, httpResponse.Code)
+
+}
+
+func TestUpdateMovie_InvalidJSONParameters(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  500,
+		Error: errors.New(constant.ErrTestResponse),
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := common.UpdateMovieRequest{
+		Id:          1,
+		Title:       "Power Ranger",
+		Description: "Pahlawan super pembela kebeneran",
+		Rating:      8,
+		Image:       "",
+	}
+
+	movieRepository.Mock.On("Update", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Patch("/movies", movieController.UpdateMovie)
+
+	// Create a request
+	requestBody, _ := json.Marshal(request)
+	req := httptest.NewRequest(http.MethodPatch, "/movies", bytes.NewBuffer(requestBody))
+
+	// comment the code below to make apicall cant read the json request propertly
+	// req.Header.Set("Content-Type", "application/json")
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("result :", httpResponse)
+
+	assert.Equal(t, http.StatusBadRequest, httpResponse.Code)
+
+}

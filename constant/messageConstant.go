@@ -8,4 +8,5 @@ const (
 	DataFound              = "Data Found."
 	DataSaved              = "Data Saved."
 	DataDeleted            = "Data Deleted."
+	DataUpdated            = "Data Updated."
 )

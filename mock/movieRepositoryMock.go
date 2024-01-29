@@ -34,3 +34,9 @@ func (movie *MovieRepositoryMock) Delete(parameter int) (response common.StatusR
 
 	return args.Get(0).(common.StatusResponse)
 }
+
+func (movie *MovieRepositoryMock) Update(parameter common.UpdateMovieRequest) (response common.StatusResponse) {
+	args := movie.Mock.Called(parameter)
+
+	return args.Get(0).(common.StatusResponse)
+}
