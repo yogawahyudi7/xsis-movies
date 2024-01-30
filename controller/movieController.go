@@ -164,7 +164,10 @@ func (get *MovieController) DeleteMovie(ctx *fiber.Ctx) error {
 		return ctx.JSON(httpResponse)
 	}
 
-	movieResponse := get.Movie.Delete(id)
+	req := model.Movie{
+		Id: uint(id),
+	}
+	movieResponse := get.Movie.Delete(req)
 
 	if movieResponse.Error != nil {
 		httpResponse.Code = 500

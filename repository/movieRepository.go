@@ -13,7 +13,7 @@ type MovieRepositoryInterface interface {
 	GetAll() ([]model.Movie, common.StatusResponse)
 	Add(parameter model.Movie) (response common.StatusResponse)
 	GetById(parameter int) (model.Movie, common.StatusResponse)
-	Delete(parameter int) (response common.StatusResponse)
+	Delete(parameter model.Movie) (response common.StatusResponse)
 	Update(parameter model.Movie) (response common.StatusResponse)
 }
 
@@ -111,12 +111,14 @@ func (movie *MovieRepository) GetById(parameter int) (model.Movie, common.Status
 	return movies, response
 }
 
-func (movie *MovieRepository) Delete(parameter int) (response common.StatusResponse) {
+func (movie *MovieRepository) Delete(parameter model.Movie) (response common.StatusResponse) {
 
-	deleteMovie := model.Movie{}
+	deleteMovie := model.Movie{
+		DeletedAt: parameter.DeletedAt,
+	}
 
 	query := movie.db.Debug()
-	query = query.Where("id = ?", parameter)
+	query = query.Where("id = ?", parameter.Id)
 	query = query.Delete(&deleteMovie)
 
 	if query.Error != nil {

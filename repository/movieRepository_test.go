@@ -701,14 +701,23 @@ func TestDeleteMovie_DataDeleted(t *testing.T) {
 
 	movieRepository := repository.NewMovieRepository(gormDB)
 
+	query := model.Movie{
+		Id: 1,
+		DeletedAt: &gorm.DeletedAt{
+			Time:  time.Now(),
+			Valid: true,
+		},
+	}
+
 	// Expect Exec to be called with a raw query
 	mock.ExpectBegin()
-	mock.ExpectExec("DELETE FROM `movies` WHERE id = ?").
-		WithArgs(1).
+
+	mock.ExpectExec("UPDATE `movies` SET").
+		WithArgs(query.DeletedAt, query.Id).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
-	response := movieRepository.Delete(1)
+	response := movieRepository.Delete(query)
 
 	assert.NoError(t, response.Error)
 }
@@ -732,14 +741,21 @@ func TestDeleteMovie_RowAffectedIsNull(t *testing.T) {
 
 	movieRepository := repository.NewMovieRepository(gormDB)
 
+	time := time.Now()
+	query := model.Movie{
+		Id: 1,
+		DeletedAt: &gorm.DeletedAt{
+			Time: time,
+		},
+	}
 	// Expect Exec to be called with a raw query
 	mock.ExpectBegin()
-	mock.ExpectExec("DELETE FROM `movies` WHERE id = ?").
-		WithArgs(1).
+	mock.ExpectExec("UPDATE `movies` SET").
+		WithArgs(query.DeletedAt, query.Id).
 		WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectCommit()
 
-	response := movieRepository.Delete(1)
+	response := movieRepository.Delete(query)
 
 	assert.Error(t, response.Error)
 }
@@ -763,14 +779,22 @@ func TestDeleteMovie_QueryError(t *testing.T) {
 
 	movieRepository := repository.NewMovieRepository(gormDB)
 
+	time := time.Now()
+	query := model.Movie{
+		Id: 1,
+		DeletedAt: &gorm.DeletedAt{
+			Time: time,
+		},
+	}
+
 	// Expect Exec to be called with a raw query
 	mock.ExpectBegin()
 	mock.ExpectExec("DELETE FROM `movies` WHERE id = ?").
-		WithArgs(1).
+		WithArgs(query.DeletedAt, query.Id).
 		WillReturnError(errors.New(constant.ErrTestResponse))
 	mock.ExpectCommit()
 
-	response := movieRepository.Delete(1)
+	response := movieRepository.Delete(query)
 
 	assert.Error(t, response.Error)
 }

@@ -405,7 +405,11 @@ func TestDeleteMovie_DataDeleted(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	movieRepository.Mock.On("Delete", 1).Return(expectedResponse)
+	request := model.Movie{
+		Id: 1,
+	}
+
+	movieRepository.Mock.On("Delete", request).Return(expectedResponse)
 
 	app := fiber.New()
 
@@ -438,7 +442,11 @@ func TestDeleteMovie_InvalidRouteParamters(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	movieRepository.Mock.On("Delete", 1).Return(expectedResponse)
+	request := model.Movie{
+		Id: 1,
+	}
+
+	movieRepository.Mock.On("Delete", request).Return(expectedResponse)
 
 	app := fiber.New()
 
@@ -460,6 +468,43 @@ func TestDeleteMovie_InvalidRouteParamters(t *testing.T) {
 
 }
 
+func TestDeleteMovie_DataIsNotAvailable(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  404,
+		Error: errors.New(constant.ErrTestResponse),
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := model.Movie{
+		Id: 1,
+	}
+
+	movieRepository.Mock.On("Delete", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Delete("/movies/:id", movieController.DeleteMovie)
+
+	req := httptest.NewRequest(http.MethodDelete, "/movies/1", nil)
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("Response : ", httpResponse)
+
+	assert.Equal(t, http.StatusNotFound, httpResponse.Code)
+
+}
+
 func TestDeleteMovie_ServerUnderMaintenance(t *testing.T) {
 
 	expectedResponse := common.StatusResponse{
@@ -471,7 +516,11 @@ func TestDeleteMovie_ServerUnderMaintenance(t *testing.T) {
 	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
 	movieController := controller.NewMovieController(validate, movieRepository)
 
-	movieRepository.Mock.On("Delete", 1).Return(expectedResponse)
+	request := model.Movie{
+		Id: 1,
+	}
+
+	movieRepository.Mock.On("Delete", request).Return(expectedResponse)
 
 	app := fiber.New()
 
@@ -515,11 +564,11 @@ func TestUpdateMovie_DataUpdated(t *testing.T) {
 
 	app := fiber.New()
 
-	app.Patch("/movies", movieController.UpdateMovie)
+	app.Patch("/movies/:id", movieController.UpdateMovie)
 
 	// Create a request
 	requestBody, _ := json.Marshal(request)
-	req := httptest.NewRequest(http.MethodPatch, "/movies", bytes.NewBuffer(requestBody))
+	req := httptest.NewRequest(http.MethodPatch, "/movies/1", bytes.NewBuffer(requestBody))
 	req.Header.Set("Content-Type", "application/json")
 
 	res, _ := app.Test(req)
@@ -533,6 +582,93 @@ func TestUpdateMovie_DataUpdated(t *testing.T) {
 	fmt.Println("result :", httpResponse)
 
 	assert.Equal(t, http.StatusOK, httpResponse.Code)
+
+}
+
+func TestUpdateMovie_InvalidRouteParamters(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  200,
+		Error: nil,
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := model.Movie{
+		Id:          1,
+		Title:       "Power Rangers",
+		Description: "Pahlawan super pembela kebeneran",
+		Rating:      8,
+		Image:       "",
+	}
+	movieRepository.Mock.On("Update", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Patch("/movies/:id", movieController.UpdateMovie)
+
+	// Create a request
+	requestBody, _ := json.Marshal(request)
+	req := httptest.NewRequest(http.MethodPatch, "/movies/a", bytes.NewBuffer(requestBody))
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("result :", httpResponse)
+
+	assert.Equal(t, http.StatusBadRequest, httpResponse.Code)
+
+}
+
+func TestUpdateMovie_DataIsNotAvailable(t *testing.T) {
+
+	expectedResponse := common.StatusResponse{
+		Code:  404,
+		Error: errors.New(constant.ErrTestResponse),
+	}
+
+	validate := validator.New()
+	movieRepository := &mck.MovieRepositoryMock{Mock: mock.Mock{}}
+	movieController := controller.NewMovieController(validate, movieRepository)
+
+	request := model.Movie{
+		Id:          1,
+		Title:       "Power Rangers",
+		Description: "Pahlawan super pembela kebeneran",
+		Rating:      8,
+		Image:       "",
+	}
+
+	movieRepository.Mock.On("Update", request).Return(expectedResponse)
+
+	app := fiber.New()
+
+	app.Patch("/movies/:id", movieController.UpdateMovie)
+
+	// Create a request
+	requestBody, _ := json.Marshal(request)
+	req := httptest.NewRequest(http.MethodPatch, "/movies/1", bytes.NewBuffer(requestBody))
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := app.Test(req)
+
+	httpResponse := common.HttpResponse{}
+
+	body, _ := io.ReadAll(res.Body)
+
+	json.Unmarshal(body, &httpResponse)
+
+	fmt.Println("result :", httpResponse)
+
+	assert.Equal(t, http.StatusNotFound, httpResponse.Code)
 
 }
 
@@ -559,11 +695,11 @@ func TestUpdateMovie_ServerUnderMaintenance(t *testing.T) {
 
 	app := fiber.New()
 
-	app.Patch("/movies", movieController.UpdateMovie)
+	app.Patch("/movies/:id", movieController.UpdateMovie)
 
 	// Create a request
 	requestBody, _ := json.Marshal(request)
-	req := httptest.NewRequest(http.MethodPatch, "/movies", bytes.NewBuffer(requestBody))
+	req := httptest.NewRequest(http.MethodPatch, "/movies/1", bytes.NewBuffer(requestBody))
 	req.Header.Set("Content-Type", "application/json")
 
 	res, _ := app.Test(req)
@@ -603,11 +739,11 @@ func TestUpdateMovie_ValidationFailed(t *testing.T) {
 
 	app := fiber.New()
 
-	app.Patch("/movies", movieController.UpdateMovie)
+	app.Patch("/movies/:id", movieController.UpdateMovie)
 
 	// Create a request
 	requestBody, _ := json.Marshal(request)
-	req := httptest.NewRequest(http.MethodPatch, "/movies", bytes.NewBuffer(requestBody))
+	req := httptest.NewRequest(http.MethodPatch, "/movies/1", bytes.NewBuffer(requestBody))
 
 	req.Header.Set("Content-Type", "application/json")
 
@@ -648,11 +784,11 @@ func TestUpdateMovie_InvalidJSONParameters(t *testing.T) {
 
 	app := fiber.New()
 
-	app.Patch("/movies", movieController.UpdateMovie)
+	app.Patch("/movies/:id", movieController.UpdateMovie)
 
 	// Create a request
 	requestBody, _ := json.Marshal(request)
-	req := httptest.NewRequest(http.MethodPatch, "/movies", bytes.NewBuffer(requestBody))
+	req := httptest.NewRequest(http.MethodPatch, "/movies/1", bytes.NewBuffer(requestBody))
 
 	// comment the code below to make apicall cant read the json request propertly
 	// req.Header.Set("Content-Type", "application/json")
