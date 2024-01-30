@@ -53,11 +53,11 @@ movies-xsis/repository/movieRepository.go:97.3,97.26 1 1
 movies-xsis/repository/movieRepository.go:100.2,100.20 1 1
 movies-xsis/repository/movieRepository.go:100.20,105.3 3 1
 movies-xsis/repository/movieRepository.go:107.2,107.25 1 1
-movies-xsis/repository/movieRepository.go:110.86,118.24 5 0
-movies-xsis/repository/movieRepository.go:118.24,124.3 3 0
-movies-xsis/repository/movieRepository.go:126.2,126.28 1 0
-movies-xsis/repository/movieRepository.go:126.28,131.3 3 0
-movies-xsis/repository/movieRepository.go:133.2,133.17 1 0
+movies-xsis/repository/movieRepository.go:110.86,118.24 5 1
+movies-xsis/repository/movieRepository.go:118.24,124.3 3 1
+movies-xsis/repository/movieRepository.go:126.2,126.28 1 1
+movies-xsis/repository/movieRepository.go:126.28,131.3 3 1
+movies-xsis/repository/movieRepository.go:133.2,133.17 1 1
 movies-xsis/repository/movieRepository.go:136.94,142.24 4 1
 movies-xsis/repository/movieRepository.go:142.24,148.3 3 1
 movies-xsis/repository/movieRepository.go:150.2,150.28 1 1

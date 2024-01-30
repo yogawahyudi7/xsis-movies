@@ -651,3 +651,96 @@ func TestUpdateMovie_RowAffectedIsNull(t *testing.T) {
 
 	assert.Error(t, response.Error)
 }
+
+func TestDeleteMovie_DataDeleted(t *testing.T) {
+
+	// Setup GORM with sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Error creating mock database: %v", err)
+	}
+	defer db.Close()
+
+	gormDB, err := gorm.Open(mysql.New(mysql.Config{
+		Conn:                      db,
+		SkipInitializeWithVersion: true,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Error opening GORM database: %v", err)
+	}
+
+	movieRepository := repository.NewMovieRepository(gormDB)
+
+	// Expect Exec to be called with a raw query
+	mock.ExpectBegin()
+	mock.ExpectExec("DELETE FROM `movies` WHERE id = ?").
+		WithArgs(1).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectCommit()
+
+	response := movieRepository.Delete(1)
+
+	assert.NoError(t, response.Error)
+}
+
+func TestDeleteMovie_RowAffectedIsNull(t *testing.T) {
+
+	// Setup GORM with sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Error creating mock database: %v", err)
+	}
+	defer db.Close()
+
+	gormDB, err := gorm.Open(mysql.New(mysql.Config{
+		Conn:                      db,
+		SkipInitializeWithVersion: true,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Error opening GORM database: %v", err)
+	}
+
+	movieRepository := repository.NewMovieRepository(gormDB)
+
+	// Expect Exec to be called with a raw query
+	mock.ExpectBegin()
+	mock.ExpectExec("DELETE FROM `movies` WHERE id = ?").
+		WithArgs(1).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+	mock.ExpectCommit()
+
+	response := movieRepository.Delete(1)
+
+	assert.Error(t, response.Error)
+}
+
+func TestDeleteMovie_QueryError(t *testing.T) {
+
+	// Setup GORM with sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Error creating mock database: %v", err)
+	}
+	defer db.Close()
+
+	gormDB, err := gorm.Open(mysql.New(mysql.Config{
+		Conn:                      db,
+		SkipInitializeWithVersion: true,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Error opening GORM database: %v", err)
+	}
+
+	movieRepository := repository.NewMovieRepository(gormDB)
+
+	// Expect Exec to be called with a raw query
+	mock.ExpectBegin()
+	mock.ExpectExec("DELETE FROM `movies` WHERE id = ?").
+		WithArgs(1).
+		WillReturnError(errors.New(constant.ErrTestResponse))
+	mock.ExpectCommit()
+
+	response := movieRepository.Delete(1)
+
+	assert.Error(t, response.Error)
+}
