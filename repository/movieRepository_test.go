@@ -68,6 +68,36 @@ func TestGetAllMovies_DataFound(t *testing.T) {
 	assert.NoError(t, response.Error)
 }
 
+func TestGetAllMovies_RecordNotFound(t *testing.T) {
+
+	// Inisialisasi mock database
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to open mock database: %v", err)
+	}
+	defer db.Close()
+
+	// Inisialisasi GORM dengan mock database
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Failed to initialize GORM: %v", err)
+	}
+
+	// Pengaturan ekspetasi query dan hasilnya
+	mock.ExpectQuery("SELECT (.+) FROM \"movies\"").WillReturnError(gorm.ErrRecordNotFound)
+
+	movieRepository := repository.NewMovieRepository(gormDB)
+
+	data, response := movieRepository.GetAll()
+
+	fmt.Println("Response : ", response)
+	fmt.Println("data : ", data)
+
+	assert.Error(t, response.Error)
+}
+
 func TestGetAllMovies_DataEmpty(t *testing.T) {
 
 	// Inisialisasi mock database
