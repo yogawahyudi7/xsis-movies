@@ -128,7 +128,7 @@ func (movie *MovieRepository) Delete(parameter int) (response common.StatusRespo
 	}
 
 	if query.RowsAffected < 1 {
-		response.Code = 500
+		response.Code = 404
 		response.Error = errors.New(constant.ErrRowAffected)
 
 		return response
@@ -152,7 +152,7 @@ func (movie *MovieRepository) Update(parameter model.Movie) (response common.Sta
 	}
 
 	if query.RowsAffected < 1 {
-		response.Code = 500
+		response.Code = 404
 		response.Error = errors.New(constant.ErrRowAffected)
 
 		return response

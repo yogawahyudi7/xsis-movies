@@ -66,7 +66,7 @@ func (get *MovieController) GetAllMovies(ctx *fiber.Ctx) error {
 
 func (get *MovieController) AddMovie(ctx *fiber.Ctx) error {
 
-	movie := common.AddMovieRequest{}
+	movie := common.UpsertMovieRequest{}
 	httpResponse := common.HttpResponse{}
 	httpResponse.Data = nil
 
@@ -170,6 +170,11 @@ func (get *MovieController) DeleteMovie(ctx *fiber.Ctx) error {
 		httpResponse.Code = 500
 		httpResponse.Message = constant.ServerUnderMaintenance
 
+		if movieResponse.Code == 404 {
+			httpResponse.Code = 404
+			httpResponse.Message = constant.DataDeleteIsNotAvailabe
+		}
+
 		return ctx.JSON(httpResponse)
 	}
 
@@ -181,9 +186,16 @@ func (get *MovieController) DeleteMovie(ctx *fiber.Ctx) error {
 
 func (get *MovieController) UpdateMovie(ctx *fiber.Ctx) error {
 
-	movie := common.UpdateMovieRequest{}
+	movie := common.UpsertMovieRequest{}
 	httpResponse := common.HttpResponse{}
 	httpResponse.Data = nil
+
+	id, err := ctx.ParamsInt("id")
+	if err != nil {
+		httpResponse.Code = 400
+		httpResponse.Message = constant.InvalidRouteParameters
+		return ctx.JSON(httpResponse)
+	}
 
 	if err := ctx.BodyParser(&movie); err != nil {
 		httpResponse.Code = 400
@@ -204,7 +216,7 @@ func (get *MovieController) UpdateMovie(ctx *fiber.Ctx) error {
 	}
 
 	req := model.Movie{
-		Id:          uint(movie.Id),
+		Id:          uint(id),
 		Title:       movie.Title,
 		Description: movie.Description,
 		Rating:      movie.Rating,
@@ -216,6 +228,10 @@ func (get *MovieController) UpdateMovie(ctx *fiber.Ctx) error {
 		httpResponse.Code = 500
 		httpResponse.Message = constant.ServerUnderMaintenance
 
+		if movieResponse.Code == 404 {
+			httpResponse.Code = 404
+			httpResponse.Message = constant.DataChangeIsNotAvailabe
+		}
 		return ctx.JSON(httpResponse)
 	}
 

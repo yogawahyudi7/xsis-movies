@@ -11,5 +11,5 @@ func RegisterMoviePath(app *fiber.App, e *controller.MovieController) {
 	app.Post("/movies", e.AddMovie)
 	app.Get("/movies/:id", e.GetMovie)
 	app.Delete("/movies/:id", e.DeleteMovie)
-	app.Patch("/movies", e.UpdateMovie)
+	app.Patch("/movies/:id", e.UpdateMovie)
 }
