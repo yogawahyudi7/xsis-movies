@@ -2,6 +2,8 @@ package model
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Movie struct {
@@ -12,7 +14,7 @@ type Movie struct {
 	Rating      float64 `gorm:"column:rating"`
 	Image       string  `gorm:"column:image"`
 
-	CreatedAt *time.Time `gorm:"column:created_at"`
-	UpdatedAt *time.Time `gorm:"column:updated_at"`
-	DeletedAt *time.Time `gorm:"column:deleted_at"`
+	CreatedAt *time.Time      `gorm:"column:created_at"`
+	UpdatedAt *time.Time      `gorm:"column:updated_at"`
+	DeletedAt *gorm.DeletedAt `gorm:"column:deleted_at"`
 }
